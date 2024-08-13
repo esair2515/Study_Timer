@@ -28,7 +28,28 @@
             <h2>Session Log</h2>
             <ul id="logList"></ul>
         </div>
+        <button id="settingsBtn">Settings</button>
         <div id="notification"></div>
+        <div id="settingsModal" class="modal">
+            <div class="modal-content">
+                <span class="closeBtn">&times;</span>
+                <h2>Settings</h2>
+                <label for="soundSelect">Notification Sound:</label>
+                <select id="soundSelect">
+                    <option value="bell.mp3">Bell</option>
+                    <option value="chime.mp3">Chime</option>
+                    <option value="alert.mp3">Alert</option>
+                </select>
+                <br><br>
+                <label for="themeSelect">Theme:</label>
+                <select id="themeSelect">
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                </select>
+                <br><br>
+                <button id="saveSettingsBtn">Save Settings</button>
+            </div>
+        </div>
         <audio id="endSound">
             <source src="bell.mp3" type="audio/mpeg">
             Your browser does not support the audio element.
