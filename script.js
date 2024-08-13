@@ -13,6 +13,13 @@ const progressBar = document.getElementById('progressBar');
 const logList = document.getElementById('logList');
 const notificationElement = document.getElementById('notification');
 
+const settingsBtn = document.getElementById('settingsBtn');
+const settingsModal = document.getElementById('settingsModal');
+const closeBtn = document.querySelector('.closeBtn');
+const soundSelect = document.getElementById('soundSelect');
+const themeSelect = document.getElementById('themeSelect');
+const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+
 function updateTimerDisplay() {
     let minutes = Math.floor(timeLeft / 60);
     let seconds = timeLeft % 60;
@@ -48,39 +55,42 @@ function startBreakTimer() {
     let breakMinutes = parseInt(breakTimeInput.value);
     timeLeft = breakMinutes * 60;
     progressBar.max = timeLeft;
+    isRunning = true;
+
     timer = setInterval(() => {
         if (timeLeft > 0) {
             timeLeft--;
             updateTimerDisplay();
-            progressBar.value = (breakMinutes * 60 - timeLeft) / (breakMinutes * 60) * 100;
         } else {
             clearInterval(timer);
             endSound.play();
             logSession('Break', breakMinutes);
-            displayNotification('Break over! Back to studying.');
-            resetTimer();
+            displayNotification('Break time is over! Time to get back to studying.');
+            isRunning = false;
         }
     }, 1000);
 }
 
 function pauseTimer() {
-    isRunning = false;
-    clearInterval(timer);
+    if (isRunning) {
+        clearInterval(timer);
+        isRunning = false;
+    }
 }
 
 function resetTimer() {
-    isRunning = false;
     clearInterval(timer);
-    timeLeft = parseInt(studyTimeInput.value) * 60; // Reset to the current study time
+    isRunning = false;
+    let studyMinutes = parseInt(studyTimeInput.value);
+    timeLeft = studyMinutes * 60;
     updateTimerDisplay();
     progressBar.value = 0;
 }
 
-function logSession(type, duration) {
-    let listItem = document.createElement('li');
-    let now = new Date();
-    listItem.textContent = `${type} - ${duration} minutes (${now.toLocaleTimeString()})`;
-    logList.appendChild(listItem);
+function logSession(type, minutes) {
+    let logEntry = document.createElement('li');
+    logEntry.textContent = `${type} session of ${minutes} minutes completed at ${new Date().toLocaleTimeString()}`;
+    logList.appendChild(logEntry);
 }
 
 function displayNotification(message) {
@@ -91,8 +101,43 @@ function displayNotification(message) {
     }, 3000);
 }
 
+function loadSettings() {
+    const sound = localStorage.getItem('notificationSound') || 'bell.mp3';
+    const theme = localStorage.getItem('theme') || 'light';
+    
+    soundSelect.value = sound;
+    themeSelect.value = theme;
+    
+    document.body.className = theme === 'dark' ? 'dark-mode' : '';
+    endSound.src = sound;
+}
+
+function saveSettings() {
+    const sound = soundSelect.value;
+    const theme = themeSelect.value;
+    
+    localStorage.setItem('notificationSound', sound);
+    localStorage.setItem('theme', theme);
+    
+    endSound.src = sound;
+    document.body.className = theme === 'dark' ? 'dark-mode' : '';
+}
+
 startBtn.addEventListener('click', startTimer);
 pauseBtn.addEventListener('click', pauseTimer);
 resetBtn.addEventListener('click', resetTimer);
 
-updateTimerDisplay();
+settingsBtn.addEventListener('click', () => {
+    settingsModal.style.display = 'block';
+});
+
+closeBtn.addEventListener('click', () => {
+    settingsModal.style.display = 'none';
+});
+
+saveSettingsBtn.addEventListener('click', () => {
+    saveSettings();
+    settingsModal.style.display = 'none';
+});
+
+window.addEventListener('load', loadSettings);
