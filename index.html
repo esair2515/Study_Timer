@@ -9,12 +9,30 @@
 <body>
     <div class="container">
         <h1>Study Timer</h1>
+        <div class="time-settings">
+            <label for="studyTime">Study Time (minutes):</label>
+            <input type="number" id="studyTime" value="25" min="1" max="120">
+            <label for="breakTime">Break Time (minutes):</label>
+            <input type="number" id="breakTime" value="5" min="1" max="60">
+        </div>
         <div id="timer">25:00</div>
+        <div id="progressBarContainer">
+            <progress id="progressBar" value="0" max="100"></progress>
+        </div>
         <div class="buttons">
             <button id="startBtn">Start</button>
             <button id="pauseBtn">Pause</button>
             <button id="resetBtn">Reset</button>
         </div>
+        <div id="logContainer">
+            <h2>Session Log</h2>
+            <ul id="logList"></ul>
+        </div>
+        <div id="notification"></div>
+        <audio id="endSound">
+            <source src="bell.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
     </div>
     <script src="script.js"></script>
 </body>
