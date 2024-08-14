@@ -77,7 +77,24 @@ h1 {
     width: 100%;
     height: 20px;
     border-radius: 5px;
-    overflow: hidden;
+    background-color: #e0e0e0;
+    border: 1px solid #ccc;
+    margin: 10px 0;
+}
+
+#progressBar::-webkit-progress-bar {
+    background-color: #e0e0e0;
+    border-radius: 5px;
+}
+
+#progressBar::-webkit-progress-value {
+    background-color: #007bff;
+    border-radius: 5px;
+}
+
+#progressBar::-moz-progress-bar {
+    background-color: #007bff;
+    border-radius: 5px;
 }
 
 #logContainer {
@@ -137,6 +154,9 @@ h1 {
     width: 80%;
     max-width: 500px;
     border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .closeBtn {
