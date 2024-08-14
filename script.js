@@ -128,16 +128,19 @@ pauseBtn.addEventListener('click', pauseTimer);
 resetBtn.addEventListener('click', resetTimer);
 
 settingsBtn.addEventListener('click', () => {
-    settingsModal.style.display = 'block';
+    settingsModal.classList.add('show');
+    settingsModal.classList.remove('hide');
 });
 
 closeBtn.addEventListener('click', () => {
-    settingsModal.style.display = 'none';
+    settingsModal.classList.add('hide');
+    settingsModal.classList.remove('show');
 });
 
 saveSettingsBtn.addEventListener('click', () => {
     saveSettings();
-    settingsModal.style.display = 'none';
+    settingsModal.classList.add('hide');
+    settingsModal.classList.remove('show');
 });
 
 window.addEventListener('load', loadSettings);
