@@ -1,6 +1,8 @@
 let timer;
 let timeLeft;
 let isRunning = false;
+let totalStudyTime = 0;
+let totalBreakTime = 0;
 
 const timerElement = document.getElementById('timer');
 const startBtn = document.getElementById('startBtn');
@@ -19,6 +21,11 @@ const closeBtn = document.querySelector('.closeBtn');
 const soundSelect = document.getElementById('soundSelect');
 const themeSelect = document.getElementById('themeSelect');
 const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+
+const totalStudyTimeElement = document.getElementById('totalStudyTime');
+const totalBreakTimeElement = document.getElementById('totalBreakTime');
+const progressLog = document.getElementById('progressLog');
+const clearLogBtn = document.getElementById('clearLogBtn');
 
 function updateTimerDisplay() {
     let minutes = Math.floor(timeLeft / 60);
@@ -44,6 +51,7 @@ function startTimer() {
                 clearInterval(timer);
                 endSound.play();
                 logSession('Study', studyMinutes);
+                totalStudyTime += studyMinutes;
                 displayNotification('Study session over! Time for a break.');
                 startBreakTimer();
             }
@@ -65,6 +73,7 @@ function startBreakTimer() {
             clearInterval(timer);
             endSound.play();
             logSession('Break', breakMinutes);
+            totalBreakTime += breakMinutes;
             displayNotification('Break time is over! Time to get back to studying.');
             isRunning = false;
         }
@@ -91,6 +100,12 @@ function logSession(type, minutes) {
     let logEntry = document.createElement('li');
     logEntry.textContent = `${type} session of ${minutes} minutes completed at ${new Date().toLocaleTimeString()}`;
     logList.appendChild(logEntry);
+
+    let progressEntry = document.createElement('li');
+    progressEntry.textContent = `${type} - ${minutes} minutes on ${new Date().toLocaleDateString()}`;
+    progressLog.appendChild(progressEntry);
+
+    updateProgressDisplay();
 }
 
 function displayNotification(message) {
@@ -99,6 +114,11 @@ function displayNotification(message) {
     setTimeout(() => {
         notificationElement.style.display = 'none';
     }, 3000);
+}
+
+function updateProgressDisplay() {
+    totalStudyTimeElement.textContent = `Total Study Time: ${totalStudyTime} minutes`;
+    totalBreakTimeElement.textContent = `Total Break Time: ${totalBreakTime} minutes`;
 }
 
 function loadSettings() {
@@ -123,9 +143,18 @@ function saveSettings() {
     document.body.className = theme === 'dark' ? 'dark-mode' : '';
 }
 
+function clearLog() {
+    logList.innerHTML = '';
+    progressLog.innerHTML = '';
+    totalStudyTime = 0;
+    totalBreakTime = 0;
+    updateProgressDisplay();
+}
+
 startBtn.addEventListener('click', startTimer);
 pauseBtn.addEventListener('click', pauseTimer);
 resetBtn.addEventListener('click', resetTimer);
+clearLogBtn.addEventListener('click', clearLog);
 
 settingsBtn.addEventListener('click', () => {
     settingsModal.classList.add('show');
@@ -144,3 +173,4 @@ saveSettingsBtn.addEventListener('click', () => {
 });
 
 window.addEventListener('load', loadSettings);
+updateProgressDisplay(); // Initial update
