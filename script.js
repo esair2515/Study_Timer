@@ -17,6 +17,7 @@ const settingsModal = document.getElementById('settings-modal');
 const studyTimeInput = document.getElementById('study-time');
 const breakTimeInput = document.getElementById('break-time');
 
+// Update timer display
 function updateTimerDisplay() {
     const minutes = Math.floor(timeLeft / 60);
     const seconds = timeLeft % 60;
@@ -24,40 +25,22 @@ function updateTimerDisplay() {
     progressBar.value = progressBar.max - timeLeft;
 }
 
+// Start timer for study or break
 function startTimer() {
-    if (!isRunning) {
-        let studyMinutes = parseInt(studyTimeInput.value);
-        if (isNaN(studyMinutes) || studyMinutes <= 0) {
-            alert("Please enter a valid study time.");
-            return;
-        }
-        timeLeft = studyMinutes * 60;
-        progressBar.max = timeLeft;
-        isRunning = true;
-        timer = setInterval(() => {
-            if (timeLeft > 0) {
-                timeLeft--;
-                updateTimerDisplay();
-            } else {
-                clearInterval(timer);
-                endSound.play();
-                logSession('Study', studyMinutes);
-                totalStudyTime += studyMinutes;
-                displayNotification('Study session complete! Time for a break.');
-                startBreak();
-            }
-        }, 1000);
-    }
-}
+    if (isRunning) return; // Prevent starting a new timer if one is already running
 
-function startBreak() {
+    let studyMinutes = parseInt(studyTimeInput.value);
     let breakMinutes = parseInt(breakTimeInput.value);
-    if (isNaN(breakMinutes) || breakMinutes <= 0) {
-        alert("Please enter a valid break time.");
+
+    if (isNaN(studyMinutes) || studyMinutes <= 0 || isNaN(breakMinutes) || breakMinutes <= 0) {
+        alert("Please enter valid study and break times.");
         return;
     }
-    timeLeft = breakMinutes * 60;
+
+    timeLeft = studyMinutes * 60;
     progressBar.max = timeLeft;
+    isRunning = true;
+
     timer = setInterval(() => {
         if (timeLeft > 0) {
             timeLeft--;
@@ -65,10 +48,26 @@ function startBreak() {
         } else {
             clearInterval(timer);
             endSound.play();
-            logSession('Break', breakMinutes);
-            totalBreakTime += breakMinutes;
-            displayNotification('Break time over! Back to study.');
-            isRunning = false;
+            logSession('Study', studyMinutes);
+            totalStudyTime += studyMinutes;
+            displayNotification('Study session complete! Time for a break.');
+
+            // Start break timer
+            timeLeft = breakMinutes * 60;
+            progressBar.max = timeLeft;
+            timer = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    updateTimerDisplay();
+                } else {
+                    clearInterval(timer);
+                    endSound.play();
+                    logSession('Break', breakMinutes);
+                    totalBreakTime += breakMinutes;
+                    displayNotification('Break time over! Back to study.');
+                    isRunning = false;
+                }
+            }, 1000);
         }
     }, 1000);
 }
@@ -110,4 +109,32 @@ function updateSummary() {
 }
 
 function applyTheme(theme) {
-    document.body.className =
+    document.body.className = '';
+    document.body.classList.add(theme);
+}
+
+function openSettings() {
+    settingsModal.classList.add('show');
+}
+
+function closeSettings() {
+    settingsModal.classList.remove('show');
+}
+
+document.getElementById('start-btn').addEventListener('click', startTimer);
+document.getElementById('pause-btn').addEventListener('click', pauseTimer);
+document.getElementById('reset-btn').addEventListener('click', resetTimer);
+document.getElementById('save-settings-btn').addEventListener('click', () => {
+    endSound.src = soundSelect.value;
+    applyTheme(themeSelect.value);
+    closeSettings();
+});
+document.getElementById('settings-btn').addEventListener('click', openSettings);
+document.getElementById('close-settings-btn').addEventListener('click', closeSettings);
+document.getElementById('clear-log-btn').addEventListener('click', () => {
+    logList.innerHTML = '';
+});
+
+document.getElementById('clear-history-btn').addEventListener('click', () => {
+    historyList.innerHTML = '';
+});
