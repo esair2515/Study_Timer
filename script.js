@@ -1,44 +1,28 @@
+// JavaScript Code
+let timeLeft = 0;
 let timer;
-let timeLeft;
 let isRunning = false;
 let totalStudyTime = 0;
 let totalBreakTime = 0;
 
 const timerElement = document.getElementById('timer');
-const startBtn = document.getElementById('startBtn');
-const pauseBtn = document.getElementById('pauseBtn');
-const resetBtn = document.getElementById('resetBtn');
-const studyTimeInput = document.getElementById('studyTime');
-const breakTimeInput = document.getElementById('breakTime');
-const endSound = document.getElementById('endSound');
-const progressBar = document.getElementById('progressBar');
-const logList = document.getElementById('logList');
-const notificationElement = document.getElementById('notification');
-
-const settingsBtn = document.getElementById('settingsBtn');
-const settingsModal = document.getElementById('settingsModal');
-const closeBtn = document.querySelector('.closeBtn');
-const soundSelect = document.getElementById('soundSelect');
-const themeSelect = document.getElementById('themeSelect');
-const saveSettingsBtn = document.getElementById('saveSettingsBtn');
-
-const totalStudyTimeElement = document.getElementById('totalStudyTime');
-const totalBreakTimeElement = document.getElementById('totalBreakTime');
-const progressLog = document.getElementById('progressLog');
-const clearLogBtn = document.getElementById('clearLogBtn');
-
-const authSection = document.getElementById('authSection');
-const timerSection = document.getElementById('timerSection');
-const progressContainer = document.getElementById('progressContainer');
-const logSection = document.getElementById('logSection');
-const summarySection = document.getElementById('summarySection');
-const summaryElement = document.getElementById('summary');
-const historySection = document.getElementById('historySection');
-const historyList = document.getElementById('historyList');
-const clearHistoryBtn = document.getElementById('clearHistoryBtn');
-const authMessage = document.getElementById('authMessage');
-const loginBtn = document.getElementById('loginBtn');
-const registerBtn = document.getElementById('registerBtn');
+const progressBar = document.getElementById('progress-bar');
+const logList = document.getElementById('log-list');
+const totalStudyTimeElement = document.getElementById('total-study-time');
+const totalBreakTimeElement = document.getElementById('total-break-time');
+const summaryElement = document.getElementById('summary-section');
+const historyList = document.getElementById('history-list');
+const soundSelect = document.getElementById('sound-select');
+const themeSelect = document.getElementById('theme-select');
+const endSound = new Audio();
+const settingsModal = document.getElementById('settings-modal');
+const authSection = document.getElementById('auth-section');
+const timerSection = document.getElementById('timer-section');
+const progressContainer = document.getElementById('progress-container');
+const logSection = document.getElementById('log-section');
+const summarySection = document.getElementById('summary-section');
+const historySection = document.getElementById('history-section');
+const authMessage = document.getElementById('auth-message');
 const usernameInput = document.getElementById('username');
 const passwordInput = document.getElementById('password');
 const forgotPassword = document.getElementById('forgotPassword');
@@ -108,7 +92,6 @@ function logSession(type, minutes) {
     const listItem = document.createElement('li');
     listItem.textContent = `${type} session of ${minutes} minutes`;
     logList.appendChild(listItem);
-    progressLog.innerHTML += `<li>${type} session of ${minutes} minutes</li>`;
     updateProgressDisplay();
     updateSummary();
     saveSessionHistory(type, minutes);
@@ -116,166 +99,79 @@ function logSession(type, minutes) {
 
 function displayNotification(message) {
     notificationElement.textContent = message;
-    setTimeout(() => notificationElement.textContent = '', 3000);
+    notificationElement.classList.add('show');
+    setTimeout(() => {
+        notificationElement.classList.remove('show');
+    }, 3000);
 }
 
-function updateProgressDisplay() {
+function saveSessionHistory(type, minutes) {
+    const historyItem = document.createElement('li');
+    historyItem.textContent = `${type} session: ${minutes} minutes`;
+    historyList.appendChild(historyItem);
+}
+
+function updateSummary() {
     totalStudyTimeElement.textContent = `Total Study Time: ${totalStudyTime} minutes`;
     totalBreakTimeElement.textContent = `Total Break Time: ${totalBreakTime} minutes`;
 }
 
-function updateSummary() {
-    summaryElement.innerHTML = `
-        <p>Total Study Sessions: ${logList.children.length}</p>
-        <p>Total Study Time: ${totalStudyTime} minutes</p>
-        <p>Total Break Time: ${totalBreakTime} minutes</p>
-    `;
+function applyTheme(theme) {
+    document.body.className = '';
+    document.body.classList.add(theme);
 }
 
-function loadSettings() {
-    const sound = localStorage.getItem('notificationSound') || 'bell.mp3';
-    const theme = localStorage.getItem('theme') || 'light';
-    
-    soundSelect.value = sound;
-    themeSelect.value = theme;
-    
-    document.body.className = theme === 'dark' ? 'dark-mode' : '';
-    endSound.src = sound;
+function openSettings() {
+    settingsModal.classList.add('show');
 }
 
-function saveSettings() {
-    const sound = soundSelect.value;
-    const theme = themeSelect.value;
-    
-    localStorage.setItem('notificationSound', sound);
-    localStorage.setItem('theme', theme);
-    
-    endSound.src = sound;
-    document.body.className = theme === 'dark' ? 'dark-mode' : '';
+function closeSettings() {
+    settingsModal.classList.remove('show');
 }
 
-function clearLog() {
+document.getElementById('start-btn').addEventListener('click', startTimer);
+document.getElementById('pause-btn').addEventListener('click', pauseTimer);
+document.getElementById('reset-btn').addEventListener('click', resetTimer);
+document.getElementById('save-settings-btn').addEventListener('click', () => {
+    endSound.src = soundSelect.value;
+    applyTheme(themeSelect.value);
+    closeSettings();
+});
+document.getElementById('settings-btn').addEventListener('click', openSettings);
+document.getElementById('close-settings-btn').addEventListener('click', closeSettings);
+document.getElementById('clear-log-btn').addEventListener('click', () => {
     logList.innerHTML = '';
-    progressLog.innerHTML = '';
-    totalStudyTime = 0;
-    totalBreakTime = 0;
-    updateProgressDisplay();
-    updateSummary();
-}
+});
 
-function saveSessionHistory(type, minutes) {
-    const session = `${type} session of ${minutes} minutes`;
-    const history = JSON.parse(localStorage.getItem('sessionHistory')) || [];
-    history.push(session);
-    localStorage.setItem('sessionHistory', JSON.stringify(history));
-    updateSessionHistory();
-}
-
-function updateSessionHistory() {
-    const history = JSON.parse(localStorage.getItem('sessionHistory')) || [];
+document.getElementById('clear-history-btn').addEventListener('click', () => {
     historyList.innerHTML = '';
-    history.forEach(session => {
-        const listItem = document.createElement('li');
-        listItem.textContent = session;
-        historyList.appendChild(listItem);
-    });
-}
+});
 
-function clearSessionHistory() {
-    localStorage.removeItem('sessionHistory');
-    historyList.innerHTML = '';
-}
-
-function authenticateUser(username, password) {
-    let users = JSON.parse(localStorage.getItem('users')) || {};
-    return users[username] === password;
-}
-
-function registerUser(username, password) {
-    let users = JSON.parse(localStorage.getItem('users')) || {};
-    if (users[username]) {
-        return false; // User already exists
-    }
-    users[username] = password;
-    localStorage.setItem('users', JSON.stringify(users));
-    return true;
-}
-
-function recoverPassword(username) {
-    let users = JSON.parse(localStorage.getItem('users')) || {};
-    if (users[username]) {
-        authMessage.textContent = `Your password is: ${users[username]}`;
-    } else {
-        authMessage.textContent = 'Username not found.';
-    }
-}
-
-function handleAuthentication(action) {
+document.getElementById('login-btn').addEventListener('click', () => {
+    // Simplified authentication check
     const username = usernameInput.value;
     const password = passwordInput.value;
 
-    if (!username || !password) {
-        authMessage.textContent = 'Please enter both username and password.';
-        return;
-    }
-
-    if (action === 'login') {
-        if (authenticateUser(username, password)) {
-            authSection.classList.add('hidden');
-            timerSection.classList.remove('hidden');
-            progressContainer.classList.remove('hidden');
-            logSection.classList.remove('hidden');
-            summarySection.classList.remove('hidden');
-            historySection.classList.remove('hidden');
-            authMessage.textContent = 'Login successful!';
-            updateSessionHistory();
-        } else {
-            authMessage.textContent = 'Invalid username or password.';
-        }
-    } else if (action === 'register') {
-        if (registerUser(username, password)) {
-            authMessage.textContent = 'Registration successful! You can now log in.';
-        } else {
-            authMessage.textContent = 'Username already exists.';
-        }
-    }
-}
-
-startBtn.addEventListener('click', startTimer);
-pauseBtn.addEventListener('click', pauseTimer);
-resetBtn.addEventListener('click', resetTimer);
-clearLogBtn.addEventListener('click', clearLog);
-
-settingsBtn.addEventListener('click', () => {
-    settingsModal.classList.add('show');
-    settingsModal.classList.remove('hide');
-});
-
-closeBtn.addEventListener('click', () => {
-    settingsModal.classList.add('hide');
-    settingsModal.classList.remove('show');
-});
-
-saveSettingsBtn.addEventListener('click', () => {
-    saveSettings();
-    settingsModal.classList.add('hide');
-    settingsModal.classList.remove('show');
-});
-
-loginBtn.addEventListener('click', () => handleAuthentication('login'));
-registerBtn.addEventListener('click', () => handleAuthentication('register'));
-forgotPassword.addEventListener('click', () => {
-    const username = usernameInput.value;
-    if (username) {
-        recoverPassword(username);
+    if (username === 'admin' && password === 'password') {
+        authMessage.textContent = 'Login successful!';
+        authMessage.style.color = 'green';
+        authSection.classList.add('hidden');
+        timerSection.classList.remove('hidden');
+        logSection.classList.remove('hidden');
+        summarySection.classList.remove('hidden');
+        historySection.classList.remove('hidden');
     } else {
-        authMessage.textContent = 'Please enter your username to recover your password.';
+        authMessage.textContent = 'Invalid username or password.';
+        authMessage.style.color = 'red';
     }
 });
 
-clearHistoryBtn.addEventListener('click', clearSessionHistory);
+document.getElementById('register-btn').addEventListener('click', () => {
+    authMessage.textContent = 'Registration is currently disabled.';
+    authMessage.style.color = 'orange';
+});
 
-window.addEventListener('load', loadSettings);
-updateProgressDisplay(); // Initial update
-updateSummary(); // Initial summary update
-updateSessionHistory(); // Initial history update
+forgotPassword.addEventListener('click', function () {
+    authMessage.textContent = "Please contact support for password reset.";
+    authMessage.style.color = 'blue';
+});
