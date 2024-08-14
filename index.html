@@ -12,7 +12,15 @@
             <h1>Study Timer</h1>
         </header>
         <main>
-            <section id="timerSection">
+            <section id="authSection">
+                <h2>Authentication</h2>
+                <input type="text" id="username" placeholder="Username">
+                <input type="password" id="password" placeholder="Password">
+                <button id="loginBtn">Login</button>
+                <button id="registerBtn">Register</button>
+                <div id="authMessage"></div>
+            </section>
+            <section id="timerSection" class="hidden">
                 <div id="timer">00:00</div>
                 <input type="number" id="studyTime" placeholder="Study Time (min)" min="1" value="30">
                 <input type="number" id="breakTime" placeholder="Break Time (min)" min="1" value="5">
@@ -23,14 +31,14 @@
                 <audio id="endSound" src="bell.mp3" preload="auto"></audio>
                 <div id="notification"></div>
             </section>
-            <section id="progressContainer">
+            <section id="progressContainer" class="hidden">
                 <h2>Progress</h2>
                 <div id="totalStudyTime">Total Study Time: 0 minutes</div>
                 <div id="totalBreakTime">Total Break Time: 0 minutes</div>
                 <ul id="progressLog"></ul>
                 <button id="clearLogBtn">Clear Log</button>
             </section>
-            <section id="logSection">
+            <section id="logSection" class="hidden">
                 <h2>Session Log</h2>
                 <ul id="logList"></ul>
             </section>
