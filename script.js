@@ -33,28 +33,29 @@ const progressContainer = document.getElementById('progressContainer');
 const logSection = document.getElementById('logSection');
 const summarySection = document.getElementById('summarySection');
 const summaryElement = document.getElementById('summary');
+const historySection = document.getElementById('historySection');
+const historyList = document.getElementById('historyList');
+const clearHistoryBtn = document.getElementById('clearHistoryBtn');
 const authMessage = document.getElementById('authMessage');
 const loginBtn = document.getElementById('loginBtn');
 const registerBtn = document.getElementById('registerBtn');
 const usernameInput = document.getElementById('username');
 const passwordInput = document.getElementById('password');
+const forgotPassword = document.getElementById('forgotPassword');
 
 function updateTimerDisplay() {
-    let minutes = Math.floor(timeLeft / 60);
-    let seconds = timeLeft % 60;
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
     timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    
-    let totalSeconds = parseInt(studyTimeInput.value) * 60;
-    let progress = ((totalSeconds - timeLeft) / totalSeconds) * 100;
-    progressBar.value = progress;
+    progressBar.value = progressBar.max - timeLeft;
 }
 
 function startTimer() {
     if (!isRunning) {
-        isRunning = true;
         let studyMinutes = parseInt(studyTimeInput.value);
         timeLeft = studyMinutes * 60;
         progressBar.max = timeLeft;
+        isRunning = true;
         timer = setInterval(() => {
             if (timeLeft > 0) {
                 timeLeft--;
@@ -64,7 +65,7 @@ function startTimer() {
                 endSound.play();
                 logSession('Study', studyMinutes);
                 totalStudyTime += studyMinutes;
-                displayNotification('Study session over! Time for a break.');
+                displayNotification('Study session complete! Time for a break.');
                 startBreak();
             }
         }, 1000);
@@ -110,6 +111,7 @@ function logSession(type, minutes) {
     progressLog.innerHTML += `<li>${type} session of ${minutes} minutes</li>`;
     updateProgressDisplay();
     updateSummary();
+    saveSessionHistory(type, minutes);
 }
 
 function displayNotification(message) {
@@ -161,6 +163,29 @@ function clearLog() {
     updateSummary();
 }
 
+function saveSessionHistory(type, minutes) {
+    const session = `${type} session of ${minutes} minutes`;
+    const history = JSON.parse(localStorage.getItem('sessionHistory')) || [];
+    history.push(session);
+    localStorage.setItem('sessionHistory', JSON.stringify(history));
+    updateSessionHistory();
+}
+
+function updateSessionHistory() {
+    const history = JSON.parse(localStorage.getItem('sessionHistory')) || [];
+    historyList.innerHTML = '';
+    history.forEach(session => {
+        const listItem = document.createElement('li');
+        listItem.textContent = session;
+        historyList.appendChild(listItem);
+    });
+}
+
+function clearSessionHistory() {
+    localStorage.removeItem('sessionHistory');
+    historyList.innerHTML = '';
+}
+
 function authenticateUser(username, password) {
     let users = JSON.parse(localStorage.getItem('users')) || {};
     return users[username] === password;
@@ -174,6 +199,15 @@ function registerUser(username, password) {
     users[username] = password;
     localStorage.setItem('users', JSON.stringify(users));
     return true;
+}
+
+function recoverPassword(username) {
+    let users = JSON.parse(localStorage.getItem('users')) || {};
+    if (users[username]) {
+        authMessage.textContent = `Your password is: ${users[username]}`;
+    } else {
+        authMessage.textContent = 'Username not found.';
+    }
 }
 
 function handleAuthentication(action) {
@@ -192,7 +226,9 @@ function handleAuthentication(action) {
             progressContainer.classList.remove('hidden');
             logSection.classList.remove('hidden');
             summarySection.classList.remove('hidden');
+            historySection.classList.remove('hidden');
             authMessage.textContent = 'Login successful!';
+            updateSessionHistory();
         } else {
             authMessage.textContent = 'Invalid username or password.';
         }
@@ -228,7 +264,18 @@ saveSettingsBtn.addEventListener('click', () => {
 
 loginBtn.addEventListener('click', () => handleAuthentication('login'));
 registerBtn.addEventListener('click', () => handleAuthentication('register'));
+forgotPassword.addEventListener('click', () => {
+    const username = usernameInput.value;
+    if (username) {
+        recoverPassword(username);
+    } else {
+        authMessage.textContent = 'Please enter your username to recover your password.';
+    }
+});
+
+clearHistoryBtn.addEventListener('click', clearSessionHistory);
 
 window.addEventListener('load', loadSettings);
 updateProgressDisplay(); // Initial update
 updateSummary(); // Initial summary update
+updateSessionHistory(); // Initial history update
