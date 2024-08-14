@@ -7,54 +7,59 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Study Timer</h1>
-        <div class="time-settings">
-            <label for="studyTime">Study Time (minutes):</label>
-            <input type="number" id="studyTime" value="25" min="1" max="120">
-            <label for="breakTime">Break Time (minutes):</label>
-            <input type="number" id="breakTime" value="5" min="1" max="60">
-        </div>
-        <div id="timer">25:00</div>
-        <div id="progressBarContainer">
-            <progress id="progressBar" value="0" max="100"></progress>
-        </div>
-        <div class="buttons">
-            <button id="startBtn">Start</button>
-            <button id="pauseBtn">Pause</button>
-            <button id="resetBtn">Reset</button>
-        </div>
-        <div id="logContainer">
-            <h2>Session Log</h2>
-            <ul id="logList"></ul>
-        </div>
-        <button id="settingsBtn">Settings</button>
-        <div id="notification"></div>
-        <div id="settingsModal" class="modal">
-            <div class="modal-content">
-                <span class="closeBtn">&times;</span>
-                <h2>Settings</h2>
-                <label for="soundSelect">Notification Sound:</label>
-                <select id="soundSelect">
-                    <option value="bell.mp3">Bell</option>
-                    <option value="chime.mp3">Chime</option>
-                    <option value="alert.mp3">Alert</option>
-                </select>
-                <br><br>
-                <label for="themeSelect">Theme:</label>
-                <select id="themeSelect">
-                    <option value="light">Light</option>
-                    <option value="dark">Dark</option>
-                </select>
-                <br><br>
-                <button id="saveSettingsBtn">Save Settings</button>
-            </div>
-        </div>
-        <audio id="endSound">
-            <source src="bell.mp3" type="audio/mpeg">
-            Your browser does not support the audio element.
-        </audio>
+    <div id="container">
+        <header>
+            <h1>Study Timer</h1>
+        </header>
+        <main>
+            <section id="timerSection">
+                <div id="timer">00:00</div>
+                <input type="number" id="studyTime" placeholder="Study Time (min)" min="1" value="30">
+                <input type="number" id="breakTime" placeholder="Break Time (min)" min="1" value="5">
+                <button id="startBtn">Start</button>
+                <button id="pauseBtn">Pause</button>
+                <button id="resetBtn">Reset</button>
+                <progress id="progressBar" value="0" max="100"></progress>
+                <audio id="endSound" src="bell.mp3" preload="auto"></audio>
+                <div id="notification"></div>
+            </section>
+            <section id="progressContainer">
+                <h2>Progress</h2>
+                <div id="totalStudyTime">Total Study Time: 0 minutes</div>
+                <div id="totalBreakTime">Total Break Time: 0 minutes</div>
+                <ul id="progressLog"></ul>
+                <button id="clearLogBtn">Clear Log</button>
+            </section>
+            <section id="logSection">
+                <h2>Session Log</h2>
+                <ul id="logList"></ul>
+            </section>
+        </main>
+        <footer>
+            <button id="settingsBtn">Settings</button>
+        </footer>
     </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal hide">
+        <div class="modal-content">
+            <span class="closeBtn">&times;</span>
+            <h2>Settings</h2>
+            <label for="soundSelect">Notification Sound:</label>
+            <select id="soundSelect">
+                <option value="bell.mp3">Bell</option>
+                <option value="chime.mp3">Chime</option>
+                <option value="beep.mp3">Beep</option>
+            </select>
+            <label for="themeSelect">Theme:</label>
+            <select id="themeSelect">
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+            </select>
+            <button id="saveSettingsBtn">Save</button>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
