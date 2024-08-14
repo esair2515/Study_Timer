@@ -27,6 +27,16 @@ const totalBreakTimeElement = document.getElementById('totalBreakTime');
 const progressLog = document.getElementById('progressLog');
 const clearLogBtn = document.getElementById('clearLogBtn');
 
+const authSection = document.getElementById('authSection');
+const timerSection = document.getElementById('timerSection');
+const progressContainer = document.getElementById('progressContainer');
+const logSection = document.getElementById('logSection');
+const authMessage = document.getElementById('authMessage');
+const loginBtn = document.getElementById('loginBtn');
+const registerBtn = document.getElementById('registerBtn');
+const usernameInput = document.getElementById('username');
+const passwordInput = document.getElementById('password');
+
 function updateTimerDisplay() {
     let minutes = Math.floor(timeLeft / 60);
     let seconds = timeLeft % 60;
@@ -97,23 +107,16 @@ function resetTimer() {
 }
 
 function logSession(type, minutes) {
-    let logEntry = document.createElement('li');
-    logEntry.textContent = `${type} session of ${minutes} minutes completed at ${new Date().toLocaleTimeString()}`;
-    logList.appendChild(logEntry);
-
-    let progressEntry = document.createElement('li');
-    progressEntry.textContent = `${type} - ${minutes} minutes on ${new Date().toLocaleDateString()}`;
-    progressLog.appendChild(progressEntry);
-
+    const listItem = document.createElement('li');
+    listItem.textContent = `${type} session of ${minutes} minutes`;
+    logList.appendChild(listItem);
+    progressLog.innerHTML += `<li>${type} session of ${minutes} minutes</li>`;
     updateProgressDisplay();
 }
 
 function displayNotification(message) {
     notificationElement.textContent = message;
-    notificationElement.style.display = 'block';
-    setTimeout(() => {
-        notificationElement.style.display = 'none';
-    }, 3000);
+    setTimeout(() => notificationElement.textContent = '', 3000);
 }
 
 function updateProgressDisplay() {
@@ -151,6 +154,49 @@ function clearLog() {
     updateProgressDisplay();
 }
 
+function authenticateUser(username, password) {
+    let users = JSON.parse(localStorage.getItem('users')) || {};
+    return users[username] === password;
+}
+
+function registerUser(username, password) {
+    let users = JSON.parse(localStorage.getItem('users')) || {};
+    if (users[username]) {
+        return false; // User already exists
+    }
+    users[username] = password;
+    localStorage.setItem('users', JSON.stringify(users));
+    return true;
+}
+
+function handleAuthentication(action) {
+    const username = usernameInput.value;
+    const password = passwordInput.value;
+
+    if (!username || !password) {
+        authMessage.textContent = 'Please enter both username and password.';
+        return;
+    }
+
+    if (action === 'login') {
+        if (authenticateUser(username, password)) {
+            authSection.classList.add('hidden');
+            timerSection.classList.remove('hidden');
+            progressContainer.classList.remove('hidden');
+            logSection.classList.remove('hidden');
+            authMessage.textContent = 'Login successful!';
+        } else {
+            authMessage.textContent = 'Invalid username or password.';
+        }
+    } else if (action === 'register') {
+        if (registerUser(username, password)) {
+            authMessage.textContent = 'Registration successful! You can now log in.';
+        } else {
+            authMessage.textContent = 'Username already exists.';
+        }
+    }
+}
+
 startBtn.addEventListener('click', startTimer);
 pauseBtn.addEventListener('click', pauseTimer);
 resetBtn.addEventListener('click', resetTimer);
@@ -171,6 +217,9 @@ saveSettingsBtn.addEventListener('click', () => {
     settingsModal.classList.add('hide');
     settingsModal.classList.remove('show');
 });
+
+loginBtn.addEventListener('click', () => handleAuthentication('login'));
+registerBtn.addEventListener('click', () => handleAuthentication('register'));
 
 window.addEventListener('load', loadSettings);
 updateProgressDisplay(); // Initial update
