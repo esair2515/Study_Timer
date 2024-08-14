@@ -31,6 +31,8 @@ const authSection = document.getElementById('authSection');
 const timerSection = document.getElementById('timerSection');
 const progressContainer = document.getElementById('progressContainer');
 const logSection = document.getElementById('logSection');
+const summarySection = document.getElementById('summarySection');
+const summaryElement = document.getElementById('summary');
 const authMessage = document.getElementById('authMessage');
 const loginBtn = document.getElementById('loginBtn');
 const registerBtn = document.getElementById('registerBtn');
@@ -63,18 +65,16 @@ function startTimer() {
                 logSession('Study', studyMinutes);
                 totalStudyTime += studyMinutes;
                 displayNotification('Study session over! Time for a break.');
-                startBreakTimer();
+                startBreak();
             }
         }, 1000);
     }
 }
 
-function startBreakTimer() {
+function startBreak() {
     let breakMinutes = parseInt(breakTimeInput.value);
     timeLeft = breakMinutes * 60;
     progressBar.max = timeLeft;
-    isRunning = true;
-
     timer = setInterval(() => {
         if (timeLeft > 0) {
             timeLeft--;
@@ -84,24 +84,21 @@ function startBreakTimer() {
             endSound.play();
             logSession('Break', breakMinutes);
             totalBreakTime += breakMinutes;
-            displayNotification('Break time is over! Time to get back to studying.');
+            displayNotification('Break time over! Back to study.');
             isRunning = false;
         }
     }, 1000);
 }
 
 function pauseTimer() {
-    if (isRunning) {
-        clearInterval(timer);
-        isRunning = false;
-    }
+    clearInterval(timer);
+    isRunning = false;
 }
 
 function resetTimer() {
     clearInterval(timer);
     isRunning = false;
-    let studyMinutes = parseInt(studyTimeInput.value);
-    timeLeft = studyMinutes * 60;
+    timeLeft = 0;
     updateTimerDisplay();
     progressBar.value = 0;
 }
@@ -112,6 +109,7 @@ function logSession(type, minutes) {
     logList.appendChild(listItem);
     progressLog.innerHTML += `<li>${type} session of ${minutes} minutes</li>`;
     updateProgressDisplay();
+    updateSummary();
 }
 
 function displayNotification(message) {
@@ -122,6 +120,14 @@ function displayNotification(message) {
 function updateProgressDisplay() {
     totalStudyTimeElement.textContent = `Total Study Time: ${totalStudyTime} minutes`;
     totalBreakTimeElement.textContent = `Total Break Time: ${totalBreakTime} minutes`;
+}
+
+function updateSummary() {
+    summaryElement.innerHTML = `
+        <p>Total Study Sessions: ${logList.children.length}</p>
+        <p>Total Study Time: ${totalStudyTime} minutes</p>
+        <p>Total Break Time: ${totalBreakTime} minutes</p>
+    `;
 }
 
 function loadSettings() {
@@ -152,6 +158,7 @@ function clearLog() {
     totalStudyTime = 0;
     totalBreakTime = 0;
     updateProgressDisplay();
+    updateSummary();
 }
 
 function authenticateUser(username, password) {
@@ -184,6 +191,7 @@ function handleAuthentication(action) {
             timerSection.classList.remove('hidden');
             progressContainer.classList.remove('hidden');
             logSection.classList.remove('hidden');
+            summarySection.classList.remove('hidden');
             authMessage.textContent = 'Login successful!';
         } else {
             authMessage.textContent = 'Invalid username or password.';
@@ -223,3 +231,4 @@ registerBtn.addEventListener('click', () => handleAuthentication('register'));
 
 window.addEventListener('load', loadSettings);
 updateProgressDisplay(); // Initial update
+updateSummary(); // Initial summary update
