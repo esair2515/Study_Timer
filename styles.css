@@ -122,3 +122,30 @@ progress {
         opacity: 1;
     }
 }
+
+#forgotPassword {
+    color: #007bff;
+    cursor: pointer;
+    margin-top: 10px;
+    text-decoration: underline;
+}
+
+#forgotPassword:hover {
+    color: #0056b3;
+}
+
+#historyList {
+    list-style-type: decimal;
+}
+
+#historySection h2 {
+    margin-top: 20px;
+}
+
+#clearHistoryBtn {
+    background-color: #ff4d4d;
+}
+
+#clearHistoryBtn:hover {
+    background-color: #cc0000;
+}
