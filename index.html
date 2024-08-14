@@ -10,20 +10,13 @@
     <div class="container">
         <h1>Study Timer</h1>
 
-        <!-- Authentication Section -->
-        <div id="auth-section">
-            <input type="text" id="username" placeholder="Username" required>
-            <input type="password" id="password" placeholder="Password" required>
-            <button id="login-btn">Login</button>
-            <button id="register-btn">Register</button>
-            <p id="auth-message"></p>
-            <button id="forgotPassword">Forgot Password?</button>
-        </div>
-
         <!-- Timer Section -->
-        <div id="timer-section" class="hidden">
+        <div id="timer-section">
             <div id="timer">00:00</div>
             <progress id="progress-bar" max="100" value="0"></progress>
+            <br>
+            <input type="number" id="study-time" placeholder="Study Time (mins)">
+            <input type="number" id="break-time" placeholder="Break Time (mins)">
             <br>
             <button id="start-btn">Start</button>
             <button id="pause-btn">Pause</button>
@@ -31,21 +24,21 @@
         </div>
 
         <!-- Log Section -->
-        <div id="log-section" class="hidden">
+        <div id="log-section">
             <h2>Session Log</h2>
             <ul id="log-list"></ul>
             <button id="clear-log-btn">Clear Log</button>
         </div>
 
         <!-- Summary Section -->
-        <div id="summary-section" class="hidden">
+        <div id="summary-section">
             <h2>Summary</h2>
             <p id="total-study-time">Total Study Time: 0 minutes</p>
             <p id="total-break-time">Total Break Time: 0 minutes</p>
         </div>
 
         <!-- History Section -->
-        <div id="history-section" class="hidden">
+        <div id="history-section">
             <h2>Session History</h2>
             <ul id="history-list"></ul>
             <button id="clear-history-btn">Clear History</button>
